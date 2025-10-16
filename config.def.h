@@ -3,10 +3,10 @@
 /* Helper macros for spawning commands */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 #define CMD(...)   { .v = (const char*[]){ __VA_ARGS__, NULL } }
-
+#include <X11/XF86keysym.h>
 /* appearance */
 #if ROUNDED_CORNERS_PATCH
-static const unsigned int borderpx       = 0;   /* border pixel of windows */
+static const unsigned int borderpx       = 3;   /* border pixel of windows */
 static const int corner_radius           = 10;
 #else
 static const unsigned int borderpx       = 1;   /* border pixel of windows */
@@ -15,7 +15,7 @@ static const unsigned int borderpx       = 1;   /* border pixel of windows */
 /* This allows the bar border size to be explicitly set separately from borderpx.
  * If left as 0 then it will default to the borderpx value of the monitor and will
  * automatically update with setborderpx. */
-static const unsigned int barborderpx    = 0;  /* border pixel of bar */
+static const unsigned int barborderpx    = 8;  /* border pixel of bar */
 #endif // BAR_BORDER_PATCH
 static const unsigned int snap           = 32;  /* snap pixel */
 #if SWALLOW_PATCH
@@ -28,10 +28,10 @@ static const int scalepreview            = 4;        /* Tag preview scaling */
 static int nomodbuttons                  = 1;   /* allow client mouse button bindings that have no modifier */
 #endif // NO_MOD_BUTTONS_PATCH
 #if VANITYGAPS_PATCH
-static const unsigned int gappih         = 20;  /* horiz inner gap between windows */
-static const unsigned int gappiv         = 10;  /* vert inner gap between windows */
-static const unsigned int gappoh         = 10;  /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov         = 30;  /* vert outer gap between windows and screen edge */
+static const unsigned int gappih         = 6;  /* horiz inner gap between windows */
+static const unsigned int gappiv         = 6;  /* vert inner gap between windows */
+static const unsigned int gappoh         = 8;  /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov         = 8;  /* vert outer gap between windows and screen edge */
 static const int smartgaps_fact          = 1;   /* gap factor when there is only one client; 0 = no gaps, 3 = 3x outer gaps */
 #endif // VANITYGAPS_PATCH
 #if AUTOSTART_PATCH
@@ -60,11 +60,11 @@ static const int showtab                 = showtab_auto;        /* Default tab b
 static const int toptab                  = False;               /* False means bottom tab bar */
 #endif // TAB_PATCH
 #if BAR_HEIGHT_PATCH
-static const int bar_height              = 0;   /* 0 means derive from font, >= 1 explicit height */
+static const int bar_height              = 36;   /* 0 means derive from font, >= 1 explicit height */
 #endif // BAR_HEIGHT_PATCH
 #if BAR_PADDING_PATCH
-static const int vertpad                 = 10;  /* vertical padding of bar */
-static const int sidepad                 = 10;  /* horizontal padding of bar */
+static const int vertpad                 = 6;  /* vertical padding of bar */
+static const int sidepad                 = 6;  /* horizontal padding of bar */
 #endif // BAR_PADDING_PATCH
 #if BAR_WINICON_PATCH
 #define ICONSIZE 20    /* icon size */
@@ -143,7 +143,7 @@ static const unsigned int maxhtab          = 200;  /* tab menu height */
 #endif // ALT_TAB_PATCH
 
 /* Indicators: see patch/bar_indicators.h for options */
-static int tagindicatortype              = INDICATOR_TOP_LEFT_SQUARE;
+static int tagindicatortype              = INDICATOR_NONE;
 static int tiledindicatortype            = INDICATOR_NONE;
 static int floatindicatortype            = INDICATOR_TOP_LEFT_SQUARE;
 #if FAKEFULLSCREEN_CLIENT_PATCH && !FAKEFULLSCREEN_PATCH
@@ -169,7 +169,7 @@ static void (*bartabmonfns[])(Monitor *) = { NULL /* , customlayoutfn */ };
 #if BAR_PANGO_PATCH
 static const char font[]                 = "monospace 10";
 #else
-static const char *fonts[]               = { "monospace:size=10" };
+static const char *fonts[]               = { "SF Pro Display:style=medium:antialias=true:size=11", "JetBrainsMonoNerdFont:antialias=true:style:size=11", "Symbols NerdFont:size=14", "Noto Color Emoji:size=13"};
 #endif // BAR_PANGO_PATCH
 static const char dmenufont[]            = "monospace:size=10";
 
@@ -423,7 +423,7 @@ static const char *layoutmenu_cmd = "layoutmenu.sh";
 #if BAR_LAUNCHER_PATCH
 static const Launcher launchers[] = {
 	/* icon to display      command        */
-	{ "surf",               CMD("surf", "duckduckgo.com") },
+	{ "         ",               CMD("menu-launcher.sh", NULL) },	
 };
 #endif // BAR_LAUNCHER_PATCH
 
@@ -437,10 +437,13 @@ static const char *const autostart[] = {
 #if RENAMED_SCRATCHPADS_PATCH
 static const char *scratchpadcmd[] = {"s", "st", "-n", "spterm", NULL};
 #elif SCRATCHPADS_PATCH
-const char *spcmd1[] = {"st", "-n", "spterm", "-g", "120x34", NULL };
+// const char *spcmd1[] = {"st", "-n", "spterm", "-g", "120x34", NULL };
+const char *spcmd1[] = {"alacritty", "--title=myscratchpad1", "-o", "window.dimensions.columns=90", "-o", "window.dimensions.lines=25",  NULL };
+const char *spcmd2[] = {"alacritty", "--title=myscratchpad2", "-o", "window.dimensions.columns=90", "-o", "window.dimensions.lines=25",  NULL };
 static Sp scratchpads[] = {
    /* name          cmd  */
-   {"spterm",      spcmd1},
+   {"scratchpad1",       spcmd1},
+   {"scratchpad2",       spcmd2},
 };
 #endif // SCRATCHPADS_PATCH
 
@@ -477,7 +480,7 @@ static char tagicons[][NUMTAGS][MAX_TAGLEN] =
 static char *tagicons[][NUMTAGS] =
 #endif // NAMETAG_PATCH
 {
-	[DEFAULT_TAGS]        = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+	[DEFAULT_TAGS]        = { "~void~", "2", "3", "4", "5", "6", "7", "8", "9" },
 	[ALTERNATIVE_TAGS]    = { "A", "B", "C", "D", "E", "F", "G", "H", "I" },
 	[ALT_TAGS_DECORATION] = { "<1>", "<2>", "<3>", "<4>", "<5>", "<6>", "<7>", "<8>", "<9>" },
 };
@@ -526,11 +529,19 @@ static const Rule rules[] = {
 	RULE(.wintype = WTYPE "TOOLBAR", .isfloating = 1)
 	RULE(.wintype = WTYPE "SPLASH", .isfloating = 1)
 	RULE(.class = "Gimp", .tags = 1 << 4)
-	RULE(.class = "Firefox", .tags = 1 << 7)
+	RULE(.class = "Firefox", .tags = 1 << 8)
+  RULE(.title = "rmpc", .tags = 1 << 2)
+  RULE(.title = "rmpc", .isfloating = 1)
+  RULE(.title = "nmtui", .isfloating = 1)
+  RULE(.title = "myscratchpad1", .isfloating = 1)
+  RULE(.title = "myscratchpad2", .isfloating = 1)  
+  RULE(.title = "Calculator", .isfloating = 1)
+  RULE(.title = "Cider", .isfloating = 1)
 	#if RENAMED_SCRATCHPADS_PATCH
 	RULE(.instance = "spterm", .scratchkey = 's', .isfloating = 1)
 	#elif SCRATCHPADS_PATCH
-	RULE(.instance = "spterm", .tags = SPTAG(0), .isfloating = 1)
+	RULE(.instance = "scratchpad1", .tags = SPTAG(0), .isfloating = 1)
+	RULE(.instance = "scratchpad2", .tags = SPTAG(1), .isfloating = 1)
 	#endif // SCRATCHPADS_PATCH
 };
 
@@ -592,7 +603,7 @@ static const BarRule barrules[] = {
 	{ -1,        0,     BAR_ALIGN_LEFT,   width_taggrid,            draw_taggrid,           click_taggrid,           NULL,                    "taggrid" },
 	#endif // BAR_TAGGRID_PATCH
 	#if BAR_SYSTRAY_PATCH
-	{  0,        0,     BAR_ALIGN_RIGHT,  width_systray,            draw_systray,           click_systray,           NULL,                    "systray" },
+	{  0,        0,     BAR_ALIGN_LEFT,  width_systray,            draw_systray,           click_systray,           NULL,                    "systray" },
 	#endif // BAR_SYSTRAY_PATCH
 	#if BAR_LTSYMBOL_PATCH
 	{ -1,        0,     BAR_ALIGN_LEFT,   width_ltsymbol,           draw_ltsymbol,          click_ltsymbol,          NULL,                    "layout" },
@@ -654,7 +665,7 @@ static const BarRule barrules[] = {
 };
 
 /* layout(s) */
-static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
+static const float mfact     = 0.5; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 #if FLEXTILE_DELUXE_LAYOUT
 static const int nstack      = 0;    /* number of clients in primary stack area */
@@ -695,8 +706,8 @@ static const int scrollargs[][2] = {
 #if FLEXTILE_DELUXE_LAYOUT
 static const Layout layouts[] = {
 	/* symbol     arrange function, { nmaster, nstack, layout, master axis, stack axis, secondary stack axis, symbol func } */
-	{ "[]=",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
- 	{ "><>",      NULL,             {0} },    /* no layout function means floating behavior */
+	{ "",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
+ 	{ "",      NULL,             {0} },    /* no layout function means floating behavior */
 	{ "[M]",      flextile,         { -1, -1, NO_SPLIT, MONOCLE, MONOCLE, 0, NULL } }, // monocle
 	{ "|||",      flextile,         { -1, -1, SPLIT_VERTICAL, LEFT_TO_RIGHT, TOP_TO_BOTTOM, 0, NULL } }, // columns (col) layout
 	{ ">M>",      flextile,         { -1, -1, FLOATING_MASTER, LEFT_TO_RIGHT, LEFT_TO_RIGHT, 0, NULL } }, // floating master
@@ -907,7 +918,7 @@ static const char *dmenucmd[] = {
 	#endif // BAR_DMENUMATCHTOP_PATCH
 	NULL
 };
-static const char *termcmd[]  = { "st", NULL };
+static const char *termcmd[]  = { "alacritty", NULL };
 
 #if BAR_STATUSCMD_PATCH
 #if BAR_DWMBLOCKS_PATCH
@@ -1032,26 +1043,47 @@ ResourcePref resources[] = {
 	{ "selSPRLbgcolor",         STRING,    &selSPRLbgcolor },
 	{ "selfloatbgcolor",        STRING,    &selfloatbgcolor },
 	#endif // BAR_FLEXWINTITLE_PATCH
-	#if BAR_LTSYMBOL_SCHEME_PATCH
-	{ "ltsymbolfgcolor",        STRING,    &ltsymbolfgcolor },
+  #if BAR_LTSYMBOL_SCHEME_PATCH
+  { "ltsymbolfgcolor",        STRING,    &ltsymbolfgcolor },
 	{ "ltsymbolbgcolor",        STRING,    &ltsymbolbgcolor },
-	#endif // BAR_LTSYMBOL_SCHEME_PATCH
+  #endif // BAR_LTSYMBOL_SCHEME_PATCH
 };
 #endif // XRESOURCES_PATCH
 
 static const Key keys[] = {
+  { 0, XF86XK_MonBrightnessDown,  spawn, SHCMD("$HOME/.config/suckless/scripts/brightness.sh down") },
+  { 0, XF86XK_MonBrightnessUp,    spawn, SHCMD("$HOME/.config/suckless/scripts/brightness.sh up") }, 
+  { 0, XF86XK_AudioLowerVolume,   spawn, SHCMD("$HOME/.config/suckless/scripts/volume.sh down") },
+  { 0, XF86XK_AudioRaiseVolume,   spawn, SHCMD("$HOME/.config/suckless/scripts/volume.sh up") },
+  { 0, XF86XK_AudioMute,          spawn, SHCMD("$HOME/.config/suckless/scripts/volume.sh toggle") },
+  { 0, XF86XK_KbdBrightnessUp,    spawn, SHCMD("$HOME/.config/suckless/scripts/kbdbacklight.sh up") },
+  { 0, XF86XK_KbdBrightnessDown,  spawn, SHCMD("$HOME/.config/suckless/scripts/kbdbacklight.sh down") },
+  { 0, XF86XK_AudioNext,          spawn, SHCMD("playerctl next") },
+  { 0, XF86XK_AudioPause,         spawn, SHCMD("playerctl play-pause") },
+  { 0, XF86XK_AudioPlay,          spawn, SHCMD("playerctl play-pause") },
+  { 0, XF86XK_AudioPrev,          spawn, SHCMD("playerctl previous") },
+  { MODKEY,                       XK_o,          spawn,                  SHCMD("menu-launcher.sh") },
+  { MODKEY,			                  XK_w,          spawn,                  SHCMD("$HOME/.config/rofi/wallpaper/wallpaper.sh") },
+  { MODKEY,			                  XK_t,          spawn,                  SHCMD("exec setsid -f kitty --title='😺 tmux 😺' -e tmux-start.sh")},
+  { MODKEY,			                  XK_n,          spawn,                  SHCMD("rofi_notes.sh")},
+  { MODKEY,			                  XK_a,          spawn,                  SHCMD("omvoid-audioswitcher")},
+  { MODKEY,			                  XK_v,          spawn,                  SHCMD("env CM_LAUNCHER=rofi_clipboard.sh clipmenu")},
+  { MODKEY,			                  XK_f,          spawn,                  SHCMD("nautilus")},
+  { MODKEY,			                  XK_b,          spawn,                  SHCMD("omvoid-launch-browser")},
+  { MODKEY,			                  XK_q,          spawn,                  SHCMD("sb-powermenu-rofi")},
+  { MODKEY,			                  XK_r,          spawn,                  SHCMD("omvoid-cmd-radio")},
 	/* modifier                     key            function                argument */
 	#if KEYMODES_PATCH
 	{ MODKEY,                       XK_Escape,     setkeymode,             {.ui = COMMANDMODE} },
 	#endif // KEYMODES_PATCH
 	{ MODKEY,                       XK_p,          spawn,                  {.v = dmenucmd } },
-	{ MODKEY|ShiftMask,             XK_Return,     spawn,                  {.v = termcmd } },
+	{ MODKEY,                       XK_Return,     spawn,                  {.v = termcmd } },
 	#if RIODRAW_PATCH
 	{ MODKEY|ControlMask,           XK_p,          riospawnsync,           {.v = dmenucmd } },
 	{ MODKEY|ControlMask,           XK_Return,     riospawn,               {.v = termcmd } },
 	{ MODKEY,                       XK_s,          rioresize,              {0} },
 	#endif // RIODRAW_PATCH
-	{ MODKEY,                       XK_b,          togglebar,              {0} },
+	{ MODKEY|ShiftMask,             XK_b,          togglebar,              {0} },
 	#if TOGGLETOPBAR_PATCH
 	{ MODKEY|ShiftMask,             XK_b,          toggletopbar,           {0} },
 	#endif // TOGGLETOPBAR_PATCH
@@ -1146,7 +1178,7 @@ static const Key keys[] = {
 	#if INSETS_PATCH
 	{ MODKEY|ShiftMask|ControlMask, XK_a,          updateinset,            {.v = &default_inset } },
 	#endif // INSETS_PATCH
-	{ MODKEY,                       XK_Return,     zoom,                   {0} },
+	{ MODKEY|ShiftMask,             XK_Return,     zoom,                   {0} },
 	#if VANITYGAPS_PATCH
 	{ MODKEY|Mod4Mask,              XK_u,          incrgaps,               {.i = +1 } },
 	{ MODKEY|Mod4Mask|ShiftMask,    XK_u,          incrgaps,               {.i = -1 } },
@@ -1183,8 +1215,8 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_backslash,  shiftview,              { .i = +1 } },
 	#endif // SHIFTVIEW_PATCH
 	#if SHIFTVIEW_CLIENTS_PATCH
-	{ MODKEY|Mod4Mask,              XK_Tab,        shiftviewclients,       { .i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_backslash,  shiftviewclients,       { .i = +1 } },
+	{ MODKEY|ShiftMask,              XK_Tab,        shiftviewclients,       { .i = -1 } },
+	{ MODKEY|ShiftMask,              XK_backslash,  shiftviewclients,       { .i = +1 } },
 	#endif // SHIFTVIEW_CLIENTS_PATCH
 	#if SHIFTBOTH_PATCH
 	{ MODKEY|ControlMask,           XK_Left,       shiftboth,              { .i = -1 } }, // note keybinding conflict with focusadjacenttag tagandviewtoleft placedir
@@ -1198,7 +1230,7 @@ static const Key keys[] = {
 	{ MODKEY|ControlMask,           XK_z,          showhideclient,         {0} },
 	{ MODKEY|ControlMask,           XK_s,          unhideall,              {0} },
 	#endif // BAR_WINTITLEACTIONS_PATCH
-	{ MODKEY|ShiftMask,             XK_c,          killclient,             {0} },
+	{ MODKEY,                       XK_c,          killclient,             {0} },
 	#if KILLUNSEL_PATCH
 	{ MODKEY|ShiftMask,             XK_x,          killunsel,              {0} },
 	#endif // KILLUNSEL_PATCH
@@ -1216,16 +1248,16 @@ static const Key keys[] = {
 	{ 0,                            HOLDKEY,       holdbar,                {0} },
 	#endif // BAR_HOLDBAR_PATCH
 	#if WINVIEW_PATCH
-	{ MODKEY,                       XK_o,          winview,                {0} },
+	{ MODKEY|ControlMask|ShiftMask, XK_o,          winview,                {0} },
 	#endif // WINVIEW_PATCH
 	#if XRDB_PATCH || XRESOURCES_PATCH
 	{ MODKEY|ShiftMask,             XK_F5,         xrdb,                   {.v = NULL } },
 	#endif // XRDB_PATCH | XRESOURCES_PATCH
-	{ MODKEY,                       XK_t,          setlayout,              {.v = &layouts[0]} },
-	{ MODKEY,                       XK_f,          setlayout,              {.v = &layouts[1]} },
+	{ MODKEY|ShiftMask,             XK_t,          setlayout,              {.v = &layouts[0]} },
+	{ MODKEY|ShiftMask,             XK_f,          setlayout,              {.v = &layouts[1]} },
 	{ MODKEY,                       XK_m,          setlayout,              {.v = &layouts[2]} },
 	#if COLUMNS_LAYOUT
-	{ MODKEY,                       XK_c,          setlayout,              {.v = &layouts[3]} },
+	{ MODKEY|ShiftMask,             XK_c,          setlayout,              {.v = &layouts[3]} },
 	#endif // COLUMNS_LAYOUT
 	#if FLEXTILE_DELUXE_LAYOUT
 	{ MODKEY|ControlMask,           XK_t,          rotatelayoutaxis,       {.i = +1 } },   /* flextile, 1 = layout axis */
@@ -1261,6 +1293,9 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_grave,      togglescratch,          {.ui = 0 } },
 	{ MODKEY|ControlMask,           XK_grave,      setscratch,             {.ui = 0 } },
 	{ MODKEY|ShiftMask,             XK_grave,      removescratch,          {.ui = 0 } },
+  { MODKEY,                       XK_s,          togglescratch,          {.ui = 1 } },
+  { MODKEY|ControlMask,           XK_s,          setscratch,             {.ui = 1 } },
+  { MODKEY|ShiftMask,             XK_s,          removescratch,          {.ui = 1 } },
 	#endif // SCRATCHPADS_PATCH | RENAMED_SCRATCHPADS_PATCH
 	#if UNFLOATVISIBLE_PATCH
 	{ MODKEY|Mod4Mask,              XK_space,      unfloatvisible,         {0} },
@@ -1502,7 +1537,10 @@ static const Button buttons[] = {
 	#if BAR_STATUSCMD_PATCH && BAR_DWMBLOCKS_PATCH
 	{ ClkStatusText,        0,                   Button1,        sigstatusbar,   {.i = 1 } },
 	{ ClkStatusText,        0,                   Button2,        sigstatusbar,   {.i = 2 } },
-	{ ClkStatusText,        0,                   Button3,        sigstatusbar,   {.i = 3 } },
+	{ ClkStatusText,        0,                   Button3,        sigstatusbar,   {.i = 3 } },	
+  { ClkStatusText,        0,                   Button4,        sigstatusbar,   {.i = 4 } },
+	{ ClkStatusText,        0,                   Button5,        sigstatusbar,   {.i = 5 } },
+	{ ClkStatusText,        0,                   Button3,        sigstatusbar,   {.i = 6 } },
 	#elif BAR_STATUSCMD_PATCH
 	{ ClkStatusText,        0,                   Button1,        spawn,          {.v = statuscmd } },
 	{ ClkStatusText,        0,                   Button2,        spawn,          {.v = statuscmd } },
